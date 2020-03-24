@@ -1,7 +1,6 @@
 package ru.geekbrains.poplib.mvp.presenter
 
 import io.reactivex.rxjava3.core.Scheduler
-import io.reactivex.rxjava3.core.Single
 import moxy.InjectViewState
 import moxy.MvpPresenter
 import ru.geekbrains.poplib.mvp.model.entity.GithubRepository
@@ -41,7 +40,6 @@ class RepositoriesPresenter(
         super.onFirstViewAttach()
         viewState.init()
         loadUser()
-        //loadRepos()
 
         repositoryListPresenter.itemClickListener = { itemView ->
             val repository = repositoryListPresenter.repositories[itemView.pos]
@@ -67,9 +65,10 @@ class RepositoriesPresenter(
     }
 
     fun loadRepos(list: List<GithubRepository>?) {
-        list?.let {   repositoryListPresenter.repositories.clear()
-                repositoryListPresenter.repositories.addAll(list)
-                viewState.updateList()
+        list?.let {
+            repositoryListPresenter.repositories.clear()
+            repositoryListPresenter.repositories.addAll(list)
+            viewState.updateList()
         }
 
     }
@@ -78,6 +77,4 @@ class RepositoriesPresenter(
         router.exit()
         return true
     }
-
-
 }
