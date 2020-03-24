@@ -1,9 +1,6 @@
 package ru.geekbrains.poplib.ui.fragment
 
-import android.app.Activity
-import android.app.AlertDialog
-import android.app.Dialog
-import android.content.Intent
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
