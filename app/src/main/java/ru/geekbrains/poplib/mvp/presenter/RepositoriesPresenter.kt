@@ -1,7 +1,6 @@
 package ru.geekbrains.poplib.mvp.presenter
 
 import io.reactivex.rxjava3.core.Scheduler
-import io.reactivex.rxjava3.core.Single
 import moxy.InjectViewState
 import moxy.MvpPresenter
 import ru.geekbrains.poplib.mvp.model.entity.GithubRepository
@@ -41,7 +40,6 @@ class RepositoriesPresenter(
         super.onFirstViewAttach()
         viewState.init()
         loadUser()
-        //loadRepos()
 
         repositoryListPresenter.itemClickListener = { itemView ->
             val repository = repositoryListPresenter.repositories[itemView.pos]
@@ -50,13 +48,14 @@ class RepositoriesPresenter(
     }
 
     fun loadUser() {
+       //val userName="googlesamples"
         val userName="Vitas1968"
         usersRepo.getUser(userName)
             .observeOn(mainThreadScheduler)
             .flatMap{
                 viewState.setUsername(it.login)
-                viewState.loadAvatar(it.avatarUrl)
-                return@flatMap repositoriesRepo.getUserRepo(it.reposUrl)
+                viewState.loadAvatar(it.avatarUrl, it.login)
+                return@flatMap repositoriesRepo.getUserRepositories(it)
             }
             .observeOn(mainThreadScheduler)
             .subscribe({
@@ -67,9 +66,10 @@ class RepositoriesPresenter(
     }
 
     fun loadRepos(list: List<GithubRepository>?) {
-        list?.let {   repositoryListPresenter.repositories.clear()
-                repositoryListPresenter.repositories.addAll(list)
-                viewState.updateList()
+        list?.let {
+            repositoryListPresenter.repositories.clear()
+            repositoryListPresenter.repositories.addAll(list)
+            viewState.updateList()
         }
 
     }
@@ -78,6 +78,4 @@ class RepositoriesPresenter(
         router.exit()
         return true
     }
-
-
 }
