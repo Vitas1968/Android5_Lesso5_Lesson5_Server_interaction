@@ -5,9 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.jakewharton.rxbinding3.view.clicks
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_repositories.*
 import moxy.MvpAppCompatFragment
@@ -22,7 +20,11 @@ import ru.geekbrains.poplib.mvp.view.RepositoriesView
 import ru.geekbrains.poplib.ui.App
 import ru.geekbrains.poplib.ui.BackButtonListener
 import ru.geekbrains.poplib.ui.adapter.RepositoriesRVAdapter
+import ru.geekbrains.poplib.ui.caching.RoomImageCache
+import ru.geekbrains.poplib.ui.caching.RoomRepositoriesCache
+import ru.geekbrains.poplib.ui.caching.RoomUserCache
 import ru.geekbrains.poplib.ui.image.GlideImageLoader
+import ru.geekbrains.poplib.ui.network.AndroidNetworkStatus
 
 
 class RepositoriesFragment : MvpAppCompatFragment(), RepositoriesView, BackButtonListener {
@@ -35,9 +37,10 @@ class RepositoriesFragment : MvpAppCompatFragment(), RepositoriesView, BackButto
     @InjectPresenter
     lateinit var presenter: RepositoriesPresenter
 
-    val imageLoader = GlideImageLoader()
+    val imageLoader = GlideImageLoader(RoomImageCache(App.instance.androidNetworkStatus,App.instance.database))
 
     var adapter: RepositoriesRVAdapter? = null
+    val networkStatus = AndroidNetworkStatus(App.instance)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         View.inflate(context, R.layout.fragment_repositories, null)
@@ -47,8 +50,9 @@ class RepositoriesFragment : MvpAppCompatFragment(), RepositoriesView, BackButto
     fun providePresenter() = RepositoriesPresenter(
         AndroidSchedulers.mainThread(),
         App.instance.router,
-        GithubRepositoriesRepo(ApiHolder.api),
-        GithubUsersRepo(ApiHolder.api)
+        GithubRepositoriesRepo(ApiHolder.api, RoomRepositoriesCache(App.instance.androidNetworkStatus,App.instance.database)),
+        GithubUsersRepo(ApiHolder.api, RoomUserCache(App.instance.androidNetworkStatus,App.instance.database)
+        )
     )
 
 
@@ -67,8 +71,8 @@ class RepositoriesFragment : MvpAppCompatFragment(), RepositoriesView, BackButto
         tv_username.text = text
     }
 
-    override fun loadAvatar(avatarUrl: String) {
-        imageLoader.loadInto(avatarUrl, iv_avatar)
+    override fun loadAvatar(avatarUrl: String,userLogin: String) {
+        imageLoader.loadInto(avatarUrl, iv_avatar,userLogin)
     }
 
     override fun backClicked() = presenter.backClicked()

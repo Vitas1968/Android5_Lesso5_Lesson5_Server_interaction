@@ -11,6 +11,6 @@ interface RepositoriesView : MvpView {
     fun updateList()
 
     fun setUsername(text: String)
-    fun loadAvatar(avatarUrl: String)
+    fun loadAvatar(avatarUrl: String, userLogin: String)
 
 }

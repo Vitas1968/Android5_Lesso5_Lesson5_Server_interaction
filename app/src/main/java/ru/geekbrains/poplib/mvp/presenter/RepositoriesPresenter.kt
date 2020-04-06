@@ -48,13 +48,14 @@ class RepositoriesPresenter(
     }
 
     fun loadUser() {
+       //val userName="googlesamples"
         val userName="Vitas1968"
         usersRepo.getUser(userName)
             .observeOn(mainThreadScheduler)
             .flatMap{
                 viewState.setUsername(it.login)
-                viewState.loadAvatar(it.avatarUrl)
-                return@flatMap repositoriesRepo.getUserRepo(it.reposUrl)
+                viewState.loadAvatar(it.avatarUrl, it.login)
+                return@flatMap repositoriesRepo.getUserRepositories(it)
             }
             .observeOn(mainThreadScheduler)
             .subscribe({
